@@ -3,14 +3,13 @@ from visit_utils import *
 from visit import *
 import os
 
-def slicer(variables_, n_slice_, zoom_, solution_):
+def slicer(variables_, n_slice_, zoom_, solution_, autolegend = False, dirname = "zoom"):
 
     # Clear visit
     DeleteAllPlots()
 
     # Copy input
     variables = variables_
-    num_proc = num_proc_
     zoom = zoom_
     n_slice = n_slice_
     lastsolution = solution_
@@ -62,8 +61,8 @@ def slicer(variables_, n_slice_, zoom_, solution_):
         if (var == "p"):
             AddPlot("Pseudocolor", "p", 1, 1)
             PseudocolorAtts = PseudocolorAttributes()
-            PseudocolorAtts.min = -1.7
-            PseudocolorAtts.max = 1.7
+            #PseudocolorAtts.min = -1.7
+            #PseudocolorAtts.max = 1.7
             PseudocolorAtts.minFlag = 1
             PseudocolorAtts.maxFlag = 1
             PseudocolorAtts.colorTableName = "RdBu"
@@ -103,6 +102,25 @@ def slicer(variables_, n_slice_, zoom_, solution_):
 
         # Draw 3D plot to extract data and slice through
         DrawPlots()
+
+        # Find min and max of plot
+        if autolegend:
+            Query("Max")
+            val1 = GetQueryOutputValue()
+
+            Query("Min")
+            val2 = GetQueryOutputValue()
+
+            if abs(val1)>abs(val2):
+                val = abs(val1)
+            else:
+                val = abs(val2)
+
+            PseudocolorAtts.min = -val
+            PseudocolorAtts.max = val
+            SetPlotOptions(PseudocolorAtts)
+
+        
 
         #Get range of data such that visit knows over which range it has to loop
         SpatialExtends = Query("SpatialExtents", use_actual_data=0)
@@ -150,7 +168,7 @@ def slicer(variables_, n_slice_, zoom_, solution_):
     
     
         # Create directory to save slices in
-        savedir = "slices-zoom-" + var
+        savedir = "slices-"+dirname+"-" + var
         if not os.path.exists(savedir):
             os.makedirs(savedir)
     

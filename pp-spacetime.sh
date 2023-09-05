@@ -11,6 +11,6 @@ echo "pwd      : [$(pwd)]"
 
 python3 $(dirname "$0")/pp-plot-residual.py
 python3 $(dirname "$0")/pp-plot-st-forces.py
-$VISITDIR/bin/visit -cli -no-vis -nowin -s $(dirname "$0")/pp-slice-st-sol-zoom.py
+$VISITDIR/bin/visit -cli  -s $(dirname "$0")/pp-slice-st-sol-zoom.py
 bash $(dirname "$0")/create-u-v-fig.sh
 bash $(dirname "$0")/create-u-v-p-fig.sh
