@@ -152,7 +152,7 @@ def slicer(variables_, n_slice_, zoom_, solution_, autolegend = False, dirname =
         SetOperatorOptions(SliceAtts, -1, 1)
 
         if(first == 1):
-            first = 0
+            #first = 0
 
             # Annotation object to show zcoordinate
             zcoor = CreateAnnotationObject("Text2D")
@@ -182,7 +182,7 @@ def slicer(variables_, n_slice_, zoom_, solution_, autolegend = False, dirname =
             SetOperatorOptions(SliceAtts, -1, 1)
 
             #Update z coordinate text in plot
-            zcoor.text = "z = " + "{:.3f}".format(z) #str(z) 
+            zcoor.text = "t = " + "{:.3f}".format(z)
 
             # Draw and save plot
             DrawPlots()
@@ -191,6 +191,8 @@ def slicer(variables_, n_slice_, zoom_, solution_, autolegend = False, dirname =
             name = SaveWindow()
             print("name = %s" % name)
     
+        zcoor.text = ""
+
         # Delete everything
         ClearAllWindows()
     
