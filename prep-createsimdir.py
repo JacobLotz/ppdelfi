@@ -76,19 +76,21 @@ def CreateMesh(extr_, mn_):
 	w    = b;
 	extr = extr_
 	ha   = 0.5;
+	aoa  = 0.0;
 
 	# Mesh stretches
 	srad = 3.0;
 	stip = 1.2;
+	stail = 1.2;
 	sw   = 1.2;
 
 	# Create mesh
 	script = "/home/jelotz/prog/delfi/build/navierstokes/nacast/mesher"
 
 	subprocess.run([script, "-tf", str(tf), "-b", str(b), "-w", str(w)
-		, "-srad", str(srad), "-stip", str(stip), "-sw" , str(sw)
+		, "-srad", str(srad), "-stip", str(stip), "-sw" , str(sw), "-stail" , str(stail)
 		,"-nrad", str(nrad),  "-ntip", str(ntip), "-ntail"
-		, str(ntail), "-nwake", str(nwake),"-m", mn_, 
+		, str(ntail), "-nwake", str(nwake),"-m", mn_, "-aoa", str(aoa),
 		"-nextr", str(nextr),"-ha", str(ha)])
 
 
