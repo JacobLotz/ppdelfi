@@ -5,7 +5,7 @@ import glob
 from slicer import slicer
 
 # Variables
-n_slice = 60;        # Number of slices
+frame_rate = 30;        # Number of slices
 nprocs = 1;
 variables = ["u", "v", "p"]
 
@@ -21,7 +21,7 @@ lastsolution = max(listsolutions, key=os.path.getctime)
 OpenComputeEngine("localhost", ("-np", str(nprocs)))
 
 # Create slices
-slicer(variables, n_slice, False, lastsolution)
+slicer(variables, frame_rate, False, lastsolution)
 
 # Stop script
 sys.exit()

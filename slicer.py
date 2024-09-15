@@ -3,7 +3,12 @@ from visit_utils import *
 from visit import *
 import os
 
-def slicer(variables_, n_slice_, zoom_, solution_, autolegend = False, dirname = "zoom"):
+from math import log10, floor
+def round_sig(x, sig=2):
+  return round(x, sig-int(floor(log10(abs(x))))-1)
+
+
+def slicer(variables_, frame_rate_, zoom_, solution_, autolegend = False, dirname = "zoom"):
 
     # Clear visit
     DeleteAllPlots()
@@ -11,7 +16,7 @@ def slicer(variables_, n_slice_, zoom_, solution_, autolegend = False, dirname =
     # Copy input
     variables = variables_
     zoom = zoom_
-    n_slice = n_slice_
+    frame_rate = frame_rate_
     lastsolution = solution_
 
     first = 1;
@@ -39,8 +44,8 @@ def slicer(variables_, n_slice_, zoom_, solution_, autolegend = False, dirname =
         if (var == "v"):
             AddPlot("Pseudocolor", "v", 1, 1)
             PseudocolorAtts = PseudocolorAttributes()
-            PseudocolorAtts.min = -1.2
-            PseudocolorAtts.max = 1.2
+            PseudocolorAtts.min = -0.00052
+            PseudocolorAtts.max = 0.00052
             PseudocolorAtts.minFlag = 1
             PseudocolorAtts.maxFlag = 1
             PseudocolorAtts.colorTableName = "RdBu"
@@ -59,6 +64,7 @@ def slicer(variables_, n_slice_, zoom_, solution_, autolegend = False, dirname =
             SetPlotOptions(PseudocolorAtts)
 
         if (var == "p"):
+            autolegend = True;
             AddPlot("Pseudocolor", "p", 1, 1)
             PseudocolorAtts = PseudocolorAttributes()
             #PseudocolorAtts.min = -1.7
@@ -69,16 +75,74 @@ def slicer(variables_, n_slice_, zoom_, solution_, autolegend = False, dirname =
             PseudocolorAtts.invertColorTable = 1
             SetPlotOptions(PseudocolorAtts)
 
+        if (var == "vmag"):
+            AddPlot("Pseudocolor", "vmag", 1, 1)
+            PseudocolorAtts = PseudocolorAttributes()
+            PseudocolorAtts.min = 0
+            PseudocolorAtts.max = 2.6
+            PseudocolorAtts.minFlag = 1
+            PseudocolorAtts.maxFlag = 1
+            PseudocolorAtts.colorTableName = "viridis_light"
+            PseudocolorAtts.invertColorTable = 0
+            SetPlotOptions(PseudocolorAtts)
+            autolegend = True;
+
+        if (var == "vmagvec"):
+            autolegend = True;
+            AddPlot("Vector", "vvec", 1, 1)
+            VectorAtts = VectorAttributes()
+            VectorAtts.nVectors = 25000/(9)
+            VectorAtts.colorByMagnitude = 0
+            VectorAtts.scale = 0.02*(3)
+            VectorAtts.glyphLocation = 1
+            SetPlotOptions(VectorAtts)
+
+            AddPlot("Pseudocolor", "vmag", 1, 1)
+            PseudocolorAtts = PseudocolorAttributes()
+            PseudocolorAtts.min = 0
+            PseudocolorAtts.max = 2.5
+            PseudocolorAtts.minFlag = 1
+            PseudocolorAtts.maxFlag = 1
+            PseudocolorAtts.colorTableName = "viridis_light"
+            PseudocolorAtts.invertColorTable = 0
+            SetPlotOptions(PseudocolorAtts)
+
         if (var == "vorticity"):
+            #autolegend = False;
             AddPlot("Pseudocolor", "vorticity", 1, 1)
             PseudocolorAtts = PseudocolorAttributes()
-            PseudocolorAtts.min = -2
-            PseudocolorAtts.max = 2
+            PseudocolorAtts.min = -20
+            PseudocolorAtts.max = 20
             PseudocolorAtts.minFlag = 1
             PseudocolorAtts.maxFlag = 1
             PseudocolorAtts.colorTableName = "RdBu"
             PseudocolorAtts.invertColorTable = 1
             SetPlotOptions(PseudocolorAtts)
+
+
+        if (var == "vorticityvec"):
+            autolegend = False;
+            AddPlot("Vector", "vvec2", 1, 1)
+            VectorAtts = VectorAttributes()
+            VectorAtts.nVectors = 25000/(4)
+            VectorAtts.colorByMagnitude = 0
+            #VectorAtts.scaleByMagnitude = 1;
+            VectorAtts.scale = 0.02*(2*2);
+            #VectorAtts.autoScale = 1;
+            VectorAtts.scaleByMagnitude = 1;
+            VectorAtts.glyphLocation = 1
+            SetPlotOptions(VectorAtts)
+
+            AddPlot("Pseudocolor", "vorticity", 1, 1)
+            PseudocolorAtts = PseudocolorAttributes()
+            PseudocolorAtts.min = -75
+            PseudocolorAtts.max = 75
+            PseudocolorAtts.minFlag = 1
+            PseudocolorAtts.maxFlag = 1
+            PseudocolorAtts.colorTableName = "RdBu"
+            PseudocolorAtts.invertColorTable = 1
+            SetPlotOptions(PseudocolorAtts)
+
 
         # 3D plot layout
         AnnotationAtts = AnnotationAttributes()
@@ -116,8 +180,16 @@ def slicer(variables_, n_slice_, zoom_, solution_, autolegend = False, dirname =
             else:
                 val = abs(val2)
 
+            if (var == "vorticityvec"):
+                val = val/(4*3)
+
+            val = round_sig(val, 2)
+
             PseudocolorAtts.min = -val
             PseudocolorAtts.max = val
+
+            if (var == "vmag" or var == "vmagvec"):
+                PseudocolorAtts.min = 0;
             SetPlotOptions(PseudocolorAtts)
 
         
@@ -134,8 +206,9 @@ def slicer(variables_, n_slice_, zoom_, solution_, autolegend = False, dirname =
         if zoom:
             # 2D view layout for slices
             View2DAtts = View2DAttributes()
-            #View2DAtts.windowCoords = (-1, 3, -2.0, 2)
-            View2DAtts.windowCoords = (-1.6, 8, -2.7, 2.7)
+            View2DAtts.windowCoords = (-0.5, 1.5, -0.75, 1.25)
+            #View2DAtts.windowCoords = (-1.6, 8, -2.7, 2.7)
+            #View2DAtts.windowCoords = (-1.2, 3.0, -0.8625, 1.5)
             View2DAtts.xScale = View2DAtts.LINEAR  # LINEAR, LOG
             View2DAtts.yScale = View2DAtts.LINEAR  # LINEAR, LOG
             View2DAtts.windowValid = 1
@@ -163,9 +236,21 @@ def slicer(variables_, n_slice_, zoom_, solution_, autolegend = False, dirname =
     
     
         # Create array of coordinates to slice over
+        n_slice = int(frame_rate*zmax)
+        n_slice = 41
         zs = np.linspace(zmin, zmax, n_slice)
         zs = zs[:-1]
-    
+
+        print(zs)
+
+        #zs = [0.0, 0.15, 0.26, 0.30, 0.50, 0.58, 0.69, 0.88]*zmax
+        zs = [0, 0.6, 1.04, 1.2, 2, 2.32, 2.76, 3.52]
+
+
+        zs = [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
+
+
+
     
         # Create directory to save slices in
         savedir = "slices-"+dirname+"-" + var
@@ -182,7 +267,7 @@ def slicer(variables_, n_slice_, zoom_, solution_, autolegend = False, dirname =
             SetOperatorOptions(SliceAtts, -1, 1)
 
             #Update z coordinate text in plot
-            zcoor.text = "t = " + "{:.3f}".format(z)
+            zcoor.text = "t/T = " + "{:.3f}".format(z/zmax)
 
             # Draw and save plot
             DrawPlots()
